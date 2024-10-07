@@ -1,0 +1,17 @@
+﻿Here is the detailed sequence diagram using Mermaid syntax:The sequence diagram represents the interactions between the various functions and components in the provided code. Here's a breakdown of the key interactions:
+1. The cli module acts as the entry point, invoking the different functions based on the user's choice.
+2. The function1 module calls the print_file_size function to print the file size and then calls the Repeat function to allow the user to select another operation.
+3. The function2 module calls the read_file function to read the contents of the input file and then calls the Repeat function.
+4. The function3 module calls the detect_arch function to detect the architecture of the input file and then calls the Repeat function.
+5. The function4 module calls the file_extension_to_input_format and output_format_to_output_extension functions to determine the input and output formats, respectively. It then calls the run_objcopy function to perform the file conversion and finally calls the Repeat function.
+6. The function5 module calls the run_binwalk function to perform an entropy check on the input file and then calls the Repeat function.
+7. The function6 module calls the generate_radare2_command function to generate the Radare2 command and then calls the run_radare2 function to perform the disassembly. It then calls the Repeat function.
+8. The function7 module calls the extract_strings function to extract the printable strings from the input file and then calls the Repeat function.
+9. The function8 module calls the generate_radare2_command and run_radare2 functions to perform the decompilation and then calls the Repeat function.
+10. The function9 module calls the analyze_crypto function to analyze the input file for any cryptographic operations and then calls the Repeat function.
+11. The function10 module calls the run_emba function to perform the decompilation and report generation, including CVE scanning. It then calls the cve_checker function to analyze the CVE report and finally calls the Repeat function.
+12. The function11 module calls the file_compare function to compare two binary files and then calls the Repeat function.
+13. The function12 module calls the print_subchoices1 function to display the firmware unpacking options, then calls the fmk function to perform the firmware extraction, and finally calls the Repeat function.
+14. The function13 module calls the firmware_repack function to repack the firmware and then calls the Repeat function.
+The sequence diagram provides a comprehensive overview of the interactions between the various components and functions, making it easier to understand the overall system behavior and the flow of execution.
+
