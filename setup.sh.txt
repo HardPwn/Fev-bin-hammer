@@ -1,0 +1,67 @@
+﻿#!/bin/bash
+
+# Check if script is run as root
+if [ "$(id -u)" -ne 0 ]; then
+  echo "Please run this script as root"
+  exit 1
+fi
+
+# Install Python dependencies
+pip install -r requirements.txt || { echo "Failed to install Python dependencies"; exit 1; }
+
+# Copy tools from local folders
+echo "Copying tools from local folders..."
+
+# Set paths to tools
+radare2_path="/fev-bin-hammer//radare2"
+r2pipe_path="/fev-bin-hammer//r2pipe"
+# Add paths for other tools...
+
+# Function to copy tools to /usr/local/bin
+copy_tool() {
+  tool_path=$1
+  tool_name=$2
+  cp -r "$tool_path" "/usr/local/bin/" || { echo "Failed to copy $tool_name"; exit 1; }
+}
+
+# Copy each tool
+copy_tool "$radare2_path" "Radare2"
+copy_tool "$r2pipe_path" "R2Pipe"
+# Add copy_tool commands for other tools...
+
+echo "Tools copied."
+
+# Generate README.md with non-Python dependencies installation instructions
+cat << EOF > README.md
+## Non-Python Dependencies Installation
+
+### Ghidra
+Download Ghidra from the [official website](https://ghidra-sre.org/) and follow the installation instructions provided.
+
+### Radare2
+Install Radare2 via package managers like \`apt\` on Linux:
+
+
+sudo apt update
+sudo apt install radare2
+
+For other operating systems or detailed instructions, refer to the [official Radare2 website](https://www.radare.org/).
+
+### Binwalk
+Install Binwalk using pip:
+
+pip install binwalk
+
+### VBinDiff
+Install vbindiff via package manager:
+
+sudo apt update
+sudo apt install vbindiff
+
+### Emba
+Install Emba from the local folder
+# Example command, replace "/fev-bin-hammer//emba" with the actual path
+cp -r /fev-bin-hammer//emba /usr/local/bin/
+EOF
+
+echo "Setup completed. Python dependencies installed. Non-Python dependencies installation instructions added to README.md."
