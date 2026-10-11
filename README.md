@@ -1,170 +1,297 @@
-# Bin-hammer
-This tool is made for automationg most of the operations regarding firmware analysis-It covers both static as well as dynamic analysis,it has detailed analysis based on all operations you select.It provides supports for following architechures:
-i386, x86-64, Alpha, ARM, AVR, BPF, MIPS, PowerPC, SPARC, RISC-V, SH, m68k, S390, XCore, CR16, HPPA, ARC, Blackfin, Z80, H8/300, V810, PDP11, m680x, V850, CRIS, XAP (CSR), PIC, LM32, 8051, 6502, i4004, i8080, Propeller, EVM, OR1K Tricore, CHIP-8, LH5801, T8200, GameBoy, SNES, SPC700, MSP430, Xtensa, xcore, NIOS II, Java, Dalvik, Pickle, WebAssembly, MSIL, EBC, TMS320 (c54x, c55x, c55+, c64x), Hexagon, Brainfuck, Malbolge, whitespace, DCPU16, LANAI, lm32, MCORE, mcs96, RSP, SuperH-4, VAX, KVX, Am29000, LOONGARCH, JDH8, s390x, STM8.
-It support file formats:Binary,Hex,Elf,Srec
-This tool covers the firmware size calculation,firmware file view,firmware file conversion,firmware architechure detection,firmware entropy check,disassembly of firmware,string extraction from firmware,detecting cryptographic footprints from the string,Anlysing cryptographic footprints from functions,It covers complete detailed decompilation along with compariosn of cve database.It also covers the firmware packing and unpacking,It also covers the binary comparison.
-
-#What is Bin-Hammer?Purpose,how it's made?
 Bin-Hammer
-Introduction to Firmware Reversing:
-Firmware is the low-level software embedded in electronic devices, responsible for controlling the
-hardware. It acts as the bridge between hardware components and higher-level software, making it a
-crucial element in any device’s functionality. As a result, analyzing firmware is essential for
-identifying security vulnerabilities, reverse engineering proprietary protocols, or even analyzing
-malware embedded in a device's firmware. However, firmware reversing presents significant
-challenges due to the complex nature of firmware files. Firmware binaries are often large,
-monolithic, and can be obfuscated or stored in proprietary formats. The diversity in processor
-architectures, file formats, and embedded operating systems means that a typical researcher must
-utilize multiple tools to analyze different aspects of firmware. This not only complicates the process
-but also introduces potential compatibility issues between the tools being used. To address these
-challenges, a comprehensive tool that integrates multiple functionalities into a single platform is
-highly desirable.
-The Challenges of Firmware Analysis:
-Firmware analysis is not a straightforward task and involves numerous challenges that can hinder
-the process. The first step is often firmware extraction, which can be complex due to encryption,
-compression, or proprietary formats. Even after successful extraction, analyzing the firmware
-requires specialized tools that can handle particular formats and architectures. One significant
-challenge lies in the sheer size and complexity of firmware codebases, which often contain large
-volumes of code with limited or no documentation. This complexity makes understanding the code
-difficult, particularly when dealing with low-level operations that interact directly with the
-hardware. Firmware developers may also use proprietary formats or obfuscate their code to prevent
-reverse engineering, requiring researchers to spend considerable time deciphering the file format
-before any meaningful analysis can begin. Furthermore, many devices use custom embedded
-operating systems that are not as well-documented or widely understood as general-purpose
-operating systems like Linux or Windows, making it challenging to understand how the firmware
-interacts with the underlying hardware.
-Debugging firmware is another challenge, as the tools available for debugging embedded systems
-are often limited. Standard debugging tools, such as GDB, are usually insufficient for firmware
-analysis, requiring researchers to develop custom tools or scripts. Moreover, modern firmware often
-includes security mechanisms such as secure boot, encryption, and integrity checks designed to
-prevent tampering and reverse engineering, adding an additional layer of complexity to the analysis.
-Many firmware binaries are closely tied to the specific hardware they are designed for, making it
-difficult to replicate hardware environments for testing purposes.
-Introducing Bin-Hammer: A Comprehensive Firmware Reversing Tool:
-The complexity and diverse nature of firmware analysis necessitate a tool that consolidates multiple
-functionalities into a single, efficient interface. Bin-Hammer is designed to address this need by
-integrating a wide array of features required for comprehensive firmware reversing. By merging the
-capabilities of established tools such as Binwalk, Radare2, Objcopy, Firmware-Mod-Kit, and
-EMBA, Bin-Hammer aims to simplify the firmware analysis process, making it more accessible and
-effective for researchers.
-Bin-Hammer offers a robust suite of functionalities tailored to streamline various aspects of
-firmware reversing. Its design ensures that researchers can perform essential operations within a
-unified environment, minimizing the need for multiple disparate tools. At its core, Bin-Hammer
-provides extensive support for handling different file formats, allowing researchers to perform
-initial file size checks in bytes, kilobytes, and megabytes. The tool supports conversion between
-numerous formats, including hex, bin, ELF, and SREC, which is crucial for analyzing firmware
-stored in various formats and enabling seamless transitions between different stages of analysis.
-Bin-Hammer excels in architecture detection, supporting over 60 architectures, which is essential
-for analyzing firmware intended for a broad range of processor types. The tool identifies
-architecture types such as ARM, x86, PowerPC, and MIPS, as well as determining endianness and
-bitness (32-bit or 64-bit). Accurate architecture detection is fundamental for correct disassembly
-and decompilation of firmware, ensuring that subsequent analysis is based on the correct processor
-specifications.
-Features and functionalities:
-One of Bin-Hammer’s standout features is its integrated disassembly and decompilation
-capabilities. Using the Capstone engine for disassembly, Bin-Hammer provides an interactive view
-with options for graph view, breakpoints, class sorting, variable read addresses, and memory
-sections. This feature enables researchers to examine firmware at a granular level, facilitating the
-identification of critical code segments. For decompilation, Bin-Hammer supports over 60
-architectures, providing interactive views for both individual functions and complete files. The
-decompiler aims to produce accurate and readable code from binary files, although achieving
-perfect accuracy can be challenging. Bin-Hammer’s decompilation functionality allows researchers
-to directly analyze the logic of firmware code, which is essential for understanding its behavior and
-identifying potential vulnerabilities.
-String analysis is a vital part of firmware reversing, as it can reveal valuable information about the
-firmware’s functionality and embedded features. Bin-Hammer automates the extraction of strings
-from binaries using the 'strings' tool from Linux. The extracted strings are compared against a
-database of cryptographic keywords to identify potential cryptographic operations within the
-firmware. Additionally, Bin-Hammer includes a feature for string editing, allowing researchers to
-modify strings within the firmware and create new files that can be flashed back into the IC for
-testing purposes. Observing operational changes resulting from these modifications can provide
-insights into how different components of the firmware interact.
-Identifying cryptographic functions within firmware is a critical aspect of security analysis. BinHammer enhances this process by providing a dedicated feature for cryptographic function analysis.
-The tool scans the decompiled code for cryptographic operations, highlighting methods and their
-addresses. This feature is particularly valuable as it simplifies the process of locating and analyzing
-cryptographic functions, which are often complex and obfuscated in firmware.
-Bin-Hammer also supports firmware unpacking and packing, which is essential for manipulating
-firmware files. The tool can handle Linux filesystem unpacking, including memory addresses and
-kernel versions, which is crucial for analyzing firmware that includes custom or non-standard
-filesystems. Additionally, Bin-Hammer supports firmware packing, enabling researchers to
-repackage modified firmware for further testing or deployment.
-The integration of EMBA (Embedded Analyzer) within Bin-Hammer adds another layer of
-functionality. EMBA is a comprehensive tool for detailed firmware scanning, providing extensive
-analysis capabilities. Bin-Hammer leverages EMBA to generate multiple scan reports, including
-CVE (Common Vulnerabilities and Exposures) checks. This integration ensures that Bin-Hammer
-users have access to up-to-date vulnerability information, which is essential for assessing the
-security of firmware.
-Bin-Hammer includes features for binary comparison and detailed reporting. Researchers can
-compare different firmware versions or binaries to identify changes, vulnerabilities, or differences
-in functionality. The reporting feature generates detailed reports on various aspects of the firmware,
-including identified vulnerabilities, architecture details, and cryptographic functions.
-Evaluation of Features
-Each feature of Bin-Hammer has been evaluated to determine its effectiveness and impact on the
-firmware reversing process. The file conversion capabilities of Bin-Hammer have been assessed for
-accuracy and efficiency, ensuring that researchers can work with a wide range of firmware files.
-Architecture detection has been evaluated for its accuracy across different processor types, with
-Bin-Hammer consistently providing correct identifications for supported architectures. This
-capability significantly reduces the complexity of firmware analysis, allowing researchers to focus
-on the core aspects of their work.
-The disassembly and decompilation features of Bin-Hammer have been compared against other
-tools such as Ghidra and IDA Pro. While Ghidra and IDA Pro offer robust disassembly and
-decompilation capabilities, Bin-Hammer’s integration of these features into a single platform
-simplifies the analysis process. The accuracy of Bin-Hammer’s disassembly and decompilation has
-been evaluated through practical tests on various firmware samples. Although achieving perfect
-accuracy is challenging, Bin-Hammer provides a high level of detail that supports effective
-analysis.
-Bin-Hammer’s string extraction and cryptographic analysis features have been evaluated for their
-effectiveness in identifying relevant strings and cryptographic functions. The tool’s automation of
-string extraction and comparison with a database of cryptographic keywords has proven to be a
-valuable asset. The accuracy of cryptographic function identification has been assessed by
-comparing Bin-Hammer’s results with manual analysis. The tool’s ability to highlight cryptographic
-functions and their addresses significantly enhances the efficiency of firmware analysis.
-The firmware unpacking and packing functionalities of Bin-Hammer have been evaluated for their
-reliability and ease of use. The tool’s support for unpacking Linux filesystems and handling custom
-file formats has been tested across various firmware samples. Bin-Hammer’s ability to repackage
-firmware for testing purposes has been assessed, with positive results indicating that the tool
-effectively manages firmware manipulation tasks.
-The integration with EMBA has been evaluated for its impact on the overall functionality of BinHammer. EMBA’s comprehensive scanning capabilities enhance Bin-Hammer’s ability to identify
-vulnerabilities and generate detailed reports. The integration ensures that users have access to up-todate vulnerability information, which is crucial for effective firmware security assessment.Related
-Work
-The development of firmware analysis tools has evolved significantly over the years, with
-numerous tools offering various features for analyzing and reversing firmware. Each tool has its
-strengths and limitations, and understanding these helps to appreciate the unique contributions of
-Bin-Hammer. Firmadyne is one of the pioneering tools in the field of firmware analysis. It focuses
-on emulating and analyzing firmware images by extracting and analyzing filesystem contents.
-Firmadyne has been widely used for its ability to provide insights into the internal structure of
-firmware images, but it primarily focuses on emulation rather than a comprehensive analysis of
-code and cryptographic functions.
-Binwalk, another widely used tool, excels in extracting and analyzing firmware images, particularly
-for identifying embedded files and filesystems. It offers features such as signature-based extraction
-and visualization of firmware components. While Binwalk is effective for initial extraction and
-analysis, it lacks the integrated disassembly and decompilation features present in Bin-Hammer.
-Radare2 is a versatile open-source framework for reverse engineering and analyzing binaries. It
-provides extensive capabilities for disassembly, debugging, and decompilation. Radare2’s flexibility
-and powerful command-line interface make it a popular choice among reverse engineers, but its
-steep learning curve and lack of integrated firmware-specific features can be challenging for users.
-IDA Pro, a commercial reverse engineering tool, is renowned for its powerful disassembly and
-decompilation capabilities. IDA Pro supports a wide range of architectures and provides detailed
-analysis features. However, its cost and complexity can be prohibitive for some users, and it lacks
-the integrated firmware-specific functionalities offered by Bin-Hammer.
-Firmware-Mod-Kit is another tool designed for analyzing and modifying firmware images. It
-focuses on unpacking and repacking firmware files, making it useful for modifying firmware
-components. However, it does not offer the comprehensive analysis features found in Bin-Hammer.
-EMBA (Embedded Analyzer) is a tool for detailed firmware scanning and vulnerability assessment.
-Its integration into Bin-Hammer enhances the tool’s ability to identify vulnerabilities and generate
-detailed reports, complementing the features offered by other tools in the field.
-Overall, Bin-Hammer distinguishes itself by combining the strengths of established tools into a
-single platform, addressing the diverse challenges of firmware analysis and providing a
-comprehensive solution for researchers and security professionals.
-Conclusion
-Bin-Hammer represents a significant advancement in the field of firmware reversing, offering a
-comprehensive suite of features that address many of the challenges associated with firmware
-analysis. By integrating functionalities from multiple established tools into a single platform, BinHammer simplifies the firmware analysis process and provides valuable insights into the security
-and functionality of firmware. The evaluations of Bin-Hammer’s features demonstrate its
-effectiveness and reliability in handling complex firmware analysis tasks. Case studies highlight the
-tool’s practical applications and its ability to address real-world challenges in various contexts. As
-firmware continues to play a critical role in modern devices, Bin-Hammer will remain an
-essentialtool for researchers and security professionals seeking to understand and improve the
-security of firmware. The ongoing development and enhancement of Bin-Hammer will ensure its
-continued relevance and effectiveness in the ever-evolving field of firmware security.I am currently
-writing UI for the Binhammer,if It is complete it will be more userfriendly.
+
+An Integrated Firmware Analysis and Reverse Engineering Toolkit
+
+Bin-Hammer is a Python-based toolkit designed to automate and simplify firmware analysis and reverse engineering. It brings multiple analysis workflows into a unified interface, helping security researchers and embedded developers inspect firmware, understand binary structures, identify cryptographic footprints, compare binaries, and investigate potential vulnerabilities.
+
+Originally developed in 2024, Bin-Hammer combines static analysis capabilities with integrations for firmware scanning and other analysis utilities. A graphical user interface is currently under development to make the tool more accessible and user-friendly.
+
+Project status: UI development in progress. Feature availability depends on the installed dependencies and external tools.
+Table of Contents
+Introduction
+Why Bin-Hammer?
+Features
+Supported File Formats
+Supported Architectures
+Analysis Workflow
+Integrations
+Technology and Design
+Installation
+Usage
+Development Roadmap
+Security and Responsible Use
+Acknowledgements
+License
+Introduction
+
+Firmware is low-level software embedded in electronic devices. It controls hardware components, manages device operations, and provides the foundation on which higher-level software operates.
+
+Firmware analysis is important for understanding device behavior, investigating security vulnerabilities, reverse engineering proprietary implementations, and evaluating the security of embedded systems.
+
+However, firmware analysis can be challenging because firmware images may contain multiple executable formats, filesystems, processor architectures, proprietary structures, and obfuscated code. Researchers often need to switch between several tools to complete a single investigation.
+
+Bin-Hammer aims to simplify this process by bringing multiple firmware analysis and reverse engineering operations into one toolkit.
+
+The project focuses on automating repetitive tasks and presenting useful analysis information in a consolidated workflow.
+
+Why Bin-Hammer?
+
+Firmware researchers frequently encounter challenges such as:
+
+Identifying unknown firmware formats and processor architectures.
+Understanding large binary files with limited documentation.
+Extracting useful strings, symbols, and cryptographic indicators.
+Disassembling and decompiling firmware for deeper inspection.
+Identifying potentially vulnerable software components.
+Unpacking and repacking firmware images.
+Comparing firmware versions to understand code changes.
+Managing multiple external tools and their dependencies.
+
+Bin-Hammer is designed to reduce the overhead associated with these tasks and help researchers organize their analysis workflow.
+
+Features
+1. Firmware File Information
+
+Inspect basic firmware properties before performing deeper analysis.
+
+File size calculation in bytes, kilobytes, and megabytes.
+Firmware file viewing and binary inspection.
+Initial file-format identification where supported.
+2. File Format Conversion
+
+Convert supported firmware files between selected formats.
+
+Binary (BIN)
+Intel HEX (HEX)
+Executable and Linkable Format (ELF)
+Motorola S-record (SREC)
+
+Conversion support depends on the source format, target format, and underlying utilities.
+
+3. Architecture Detection
+
+Identify processor architectures and relevant binary characteristics to assist with subsequent analysis.
+
+The project targets a broad range of architectures, including ARM, x86, MIPS, PowerPC, RISC-V, AVR, MSP430, SuperH, and numerous legacy and specialized instruction sets.
+
+Architecture detection results should be verified when dealing with ambiguous, packed, encrypted, or nonstandard binaries.
+
+4. Firmware Entropy Analysis
+
+Calculate and inspect firmware entropy to help identify regions that may contain compressed, encrypted, or otherwise high-entropy data.
+
+Entropy is an analytical indicator, not proof of encryption or malicious activity.
+
+5. Disassembly
+
+Inspect machine instructions to understand the low-level behavior of firmware.
+
+The project uses the Capstone disassembly engine for supported instruction sets and aims to provide useful instruction-level analysis.
+
+6. String Extraction and Analysis
+
+Extract human-readable strings from firmware binaries to identify potentially useful information, including:
+
+Debug messages and error strings.
+File paths and configuration references.
+URLs, network-related strings, and identifiers.
+Possible cryptographic algorithm names and keywords.
+Other indicators that may help guide reverse engineering.
+
+The extracted strings can be examined for potential cryptographic footprints and other security-relevant information.
+
+7. Cryptographic Footprint Detection
+
+Search extracted strings for keywords and indicators associated with cryptographic functionality.
+
+This can help researchers identify areas that may use encryption, hashing, key management, or related operations.
+
+Keyword matches are leads for further investigation and do not independently confirm that a cryptographic algorithm is implemented or used securely.
+
+8. Cryptographic Function Analysis
+
+Inspect decompiled code and function-level information to locate potential cryptographic routines and their addresses.
+
+This functionality aims to help researchers investigate cryptographic implementations and understand how relevant routines are used within firmware.
+
+Results depend on the quality of the disassembly, decompilation, symbols, and analysis configuration.
+
+9. Decompilation
+
+Analyze firmware at a higher level by examining decompiled representations of binary code.
+
+The project aims to support a broad range of processor architectures through its analysis tooling and integrations.
+
+Decompiled output is an approximation of the original program logic. It may be incomplete or inaccurate, particularly when analyzing optimized, stripped, obfuscated, or unsupported binaries.
+
+10. Firmware Vulnerability Scanning
+
+Integrate firmware scanning workflows, including EMBA where configured, to help identify potentially vulnerable components and known security issues.
+
+Potential capabilities include:
+
+Firmware component identification.
+Software and package inventory.
+CVE-related checks.
+Security findings and report generation.
+
+Findings should be independently verified. A CVE match does not automatically establish that a device is exploitable or affected in its deployed configuration.
+
+11. Firmware Unpacking and Packing
+
+Support firmware extraction and repacking workflows using the relevant underlying utilities.
+
+These operations can help researchers inspect firmware filesystems, investigate extracted components, and prepare modified firmware for controlled testing.
+
+Successful extraction or repacking depends on the image format, compression, encryption, integrity checks, and available tooling.
+
+12. Binary Comparison
+
+Compare two binaries or firmware versions to identify differences that may be relevant to reverse engineering or security investigations.
+
+This can help researchers investigate firmware updates, code changes, and potentially significant modifications between releases.
+
+13. Detailed Analysis Reports
+
+Consolidate available analysis results into reports that help researchers review firmware characteristics and security findings.
+
+The information available depends on the analysis operations performed and the integrations configured.
+
+Supported File Formats
+
+Bin-Hammer targets the following formats:
+
+Format	Description
+BIN	Raw binary data
+HEX	Hexadecimal firmware representation
+ELF	Executable and Linkable Format
+SREC	Motorola S-record format
+
+Not every operation necessarily supports every format.
+
+Supported Architectures
+
+Bin-Hammer targets the following processor architectures, instruction sets, and executable-code formats through its analysis workflows and underlying tools.
+
+Mainstream and embedded architectures
+
+i386, x86-64, ARM, AVR, MIPS, PowerPC, RISC-V, SPARC, SH, SuperH-4, m68k, m680x, mcs96, S390, s390x, MSP430, Xtensa, NIOS II, V850, CR16, CRIS, Blackfin, ARC, HPPA, Alpha, BPF, XCore, MCORE, LM32, LANAI, VAX, LOONGARCH, KVX, Am29000, TriCore, EBC, Hexagon, TMS320 (c54x, c55x, c55+, c64x), STM8, Z80, H8/300, V810, PDP11, PIC, Propeller, i4004, i8080, 6502, RSP, JDH8, XAP (CSR), T8200.
+
+Virtual machines, bytecode, and specialized instruction sets
+
+EVM, CHIP-8, GameBoy, SNES, SPC700, Java, Dalvik, WebAssembly, MSIL, Pickle, OR1K, DCPU16, Brainfuck, Malbolge, Whitespace, LH5801.
+
+The architecture list reflects intended or underlying-tool support. Actual availability and accuracy should be verified for the installed version and individual analysis operations. Some entries may require specific external tools or plugins.
+
+Analysis Workflow
+
+A typical firmware investigation with Bin-Hammer may follow this sequence:
+
+Inspect: Determine file size and examine the input file.
+Identify: Detect the likely architecture and supported format.
+Analyze: Calculate entropy and extract strings.
+Reverse engineer: Disassemble and inspect decompiled output.
+Investigate: Examine cryptographic indicators and potentially relevant functions.
+Scan: Run configured firmware analysis and vulnerability-scanning tools.
+Compare: Examine differences between firmware versions.
+Report: Consolidate findings for further investigation.
+
+Not every workflow step is applicable to every firmware image.
+
+Integrations
+
+Bin-Hammer is designed to work with established tools and frameworks used in firmware analysis and reverse engineering.
+
+Tool or project	Intended role
+Capstone	Disassembly
+Binwalk	Firmware identification and extraction workflows
+Radare2	Binary analysis and reverse engineering
+GNU objcopy	Supported object-file conversion operations
+Firmware-Mod-Kit	Firmware modification and repacking workflows
+EMBA	Embedded firmware security analysis
+
+The availability of a particular integration depends on the implementation, installed dependencies, configuration, and compatibility of the underlying tool.
+
+Bin-Hammer is an independent project and should not be interpreted as an official distribution of these tools.
+
+Technology and Design
+
+Bin-Hammer is built around Python and command-line workflows, with integrations for binary analysis, firmware inspection, and security scanning.
+
+The project is intended to consolidate multiple operations into a single interface while reducing repetitive manual work.
+
+A graphical user interface is currently under development, with the goal of improving usability and making firmware analysis workflows easier to navigate.
+
+Installation
+
+Installation instructions will depend on the current repository structure and supported dependencies.
+
+Prerequisites
+Linux environment recommended for the current workflow.
+Python 3.
+Required Python packages.
+External analysis utilities needed for the selected features.
+Get the source code
+git clone https://github.com/HardPwn/Bin-Hammer.git
+cd Bin-Hammer
+
+
+If the repository still uses its previous name, replace Bin-Hammer with the actual repository name.
+
+Review the project's dependency files and setup instructions before installing or executing the tool. Installation commands for external utilities should be documented once the dependency list has been verified.
+
+Usage
+
+The current application provides an interactive command-line interface.
+
+If the main script is named Bin-hammer.py, launch it with:
+
+python3 Bin-hammer.py
+
+
+Select an available operation from the menu and follow the prompts.
+
+The command above assumes that the script and its dependencies are present in the current directory. Update this section if the entry point changes during UI development.
+
+Development Roadmap
+
+Planned and ongoing improvements include:
+
+Complete the graphical user interface.
+Improve installation and dependency management.
+Expand automated testing across supported file formats and architectures.
+Improve error handling for malformed and unsupported firmware.
+Enhance report generation and result organization.
+Improve architecture detection and analysis workflows.
+Document external dependencies and integration requirements.
+Validate individual features against representative test samples.
+Improve usability and documentation for new researchers.
+
+Roadmap items reflect development goals and may change as the project evolves.
+
+Security and Responsible Use
+
+Bin-Hammer is intended for authorized firmware analysis, security research, education, and defensive security testing.
+
+Analyze only firmware and binaries you own or have permission to examine.
+Treat unknown firmware and extracted files as untrusted input.
+Use isolated environments when analyzing potentially malicious samples.
+Verify vulnerability findings before making security conclusions.
+Back up firmware before attempting modifications or repacking.
+Follow applicable laws, licenses, and responsible disclosure practices.
+
+Firmware modification and flashing can damage devices or render them unusable. Test modified firmware only on hardware you are authorized to use and can safely recover.
+
+Acknowledgements
+
+Bin-Hammer builds upon the work of the open-source security and reverse-engineering community.
+
+Thanks to the developers and maintainers of Capstone, Binwalk, Radare2, GNU Binutils, Firmware-Mod-Kit, EMBA, and other relevant projects.
+
+Please consult the respective projects for their licenses, documentation, and attribution requirements.
+
+License
+
+A license has not yet been specified in this README. Add the appropriate license after reviewing ownership, dependencies, and redistribution requirements.
+
+Bin-Hammer — Simplifying Firmware Analysis and Reverse Engineering.
